@@ -1,0 +1,103 @@
+@font-face {
+    font-family: TitleFont;
+    src: url(AppleSDGothicNeoH.ttf);
+}
+
+@font-face {
+    font-family: SubFont;
+    src: url(FontsFree-Net-AvenirLTStd-Book.ttf)
+}
+
+.header {
+  overflow: hidden;
+  background-color: #7dadc1;
+  padding: 10px 10px;
+  box-shadow: 7px 8px #507c91;
+}
+
+body {
+    background-image: url("Website-background.png");
+    background-size: cover;
+    background-color: #59719e;
+}
+
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateY(-50%, -50%);
+    transform: translateY(-50%, -50%);
+    vertical-align: center;
+}
+
+#logo {
+  margin-left: 10px;
+}
+
+.header a {
+  float: left;
+  color: white;
+  font-family: TitleFont;
+  text-decoration: none;
+  text-align: center;
+  padding: 12px;
+  font-size: 18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+
+.header a:hover {
+  transform: scale(1.1);
+  color: rgb(214, 214, 214);
+}
+
+.header-right {
+  float: right;
+}
+
+@media screen and (max-width: 500px) {
+  .header a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .header-right {
+    float: none;
+  }
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+  font-family: SubFont;
+}
+
+input[type=submit] {
+  background-color: #d81159;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 20px;
+  font-family: SubFont;;
+}
+
+input[type=submit]:hover {
+  background-color: #e72f72;
+}
+
+.container {
+  border-radius: 10px;
+  background-color: #f2f2f2;
+  padding: 10px;
+  width: 750px;
+  height: 450px;
+  margin: 0 auto;
+  font-family: TitleFont;
+  margin-top: 100px;
+}
