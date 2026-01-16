@@ -1,0 +1,262 @@
+<!doctype html>
+<head>
+    <link rel="stylesheet" href="Quiztest07.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+    <div class="header">
+    <img id="logo" src="LogoMediaVeiligWit.png" wdith="120" height="60">
+    <div class="header-right">
+        <a class="active" href="TestJezelf-hoofdpagina.html">HOME</a>
+        <a href="TestJezelfContact.html">CONTACT</a>
+        <a href="TestJezelfAbout.html">ABOUT</a>
+    </div>
+    </div>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="meta">
+      <div class="progress"><div id="progressBar"></div></div>
+      <div class="pill" id="counter"></div>
+    </div>
+
+    <div id="intro">
+      <h2>Uitleg</h2>
+      <p>
+        Je krijgt zo 6 vragen te zien. Bij elke vraag zie je een bericht (afbeelding). Je kan op dit bericht klikken om het te vergroten.
+        Kies of het bericht <strong>Betrouwbaar</strong> of <strong>Onbetrouwbaar</strong> is.
+        Je hebt <strong>15 seconden</strong> per vraag. Als de tijd op is, wordt de vraag fout gerekend.
+      </p>
+      <button id="startBtn">Start de quiz</button>
+    </div>
+
+    <div id="quiz" style="display:none;">
+      <div class="question-row">
+        <div class="question" id="questionText"></div>
+          <div class="timer" id="timer">15s</div>
+        </div>
+
+        <div class="image-container">
+            <img id="questionImage" class="photo-item" height="400" alt="Question image">
+        </div>
+
+        <div class="buttons">
+          <button class="true" id="trueBtn">Betrouwbaar</button>
+          <button class="false" id="falseBtn">Onbetrouwbaar</button>
+        </div>
+      </div>
+
+      <div id="result" class="result" style="display:none;">
+        <h2>Resultaten</h2>
+      <div id="scoreLine"></div>
+
+      <div class="buttons">
+        <button id="restartBtn">Herstart</button>
+        <button id="reviewBtn">Resultaten</button>
+      </div>
+    </div>
+
+  <div id="review" class="result" style="display:none;">
+    <h2>Overzicht antwoorden</h2>
+  <div id="reviewList"></div>
+
+  <div class="buttons">
+    <button id="backToIntroBtn">Terug naar start</button>
+  </div>
+</div>
+
+  </div>
+</div>
+
+<div id="imageModal" class="modal">
+  <span class="close" id="modalClose">&times;</span>
+  <img id="modalImage" class="modal-content" alt="Zoomed image">
+</div>
+
+<script>
+  const QUESTIONS = [
+    { text: "Is dit bericht betrouwbaar?", correct: false },
+    { text: "Is dit bericht betrouwbaar?", correct: true },
+    { text: "Is dit bericht betrouwbaar?", correct: true },
+    { text: "Is dit bericht betrouwbaar?", correct: false },
+    { text: "Is dit bericht betrouwbaar?", correct: false },
+    { text: "Is dit bericht betrouwbaar?", correct: false }
+  ];
+
+  const TIME_PER_QUESTION = 15;
+
+  let index = 0;
+  let answers = Array(QUESTIONS.length).fill(null);
+  let timeLeft = TIME_PER_QUESTION;
+  let timerInterval = null;
+
+  const els = {
+    intro: document.getElementById("intro"),
+    startBtn: document.getElementById("startBtn"),
+
+    quiz: document.getElementById("quiz"),
+    questionText: document.getElementById("questionText"),
+    counter: document.getElementById("counter"),
+    progressBar: document.getElementById("progressBar"),
+    timer: document.getElementById("timer"),
+    questionImage: document.getElementById("questionImage"),
+
+    trueBtn: document.getElementById("trueBtn"),
+    falseBtn: document.getElementById("falseBtn"),
+
+    result: document.getElementById("result"),
+    scoreLine: document.getElementById("scoreLine"),
+    restartBtn: document.getElementById("restartBtn"),
+    reviewBtn: document.getElementById("reviewBtn"),
+
+    review: document.getElementById("review"),
+    reviewList: document.getElementById("reviewList"),
+    backToIntroBtn: document.getElementById("backToIntroBtn"),
+
+    imageModal: document.getElementById("imageModal"),
+    modalImage: document.getElementById("modalImage"),
+    modalClose: document.getElementById("modalClose")
+  };
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = TIME_PER_QUESTION;
+    els.timer.textContent = `${timeLeft}s`;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      els.timer.textContent = `${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        nextQuestion();
+      }
+    }, 1000);
+  }
+
+  function render() {
+    const q = QUESTIONS[index];
+
+    els.questionText.textContent = q.text;
+    els.counter.textContent = `Vraag ${index + 1} / ${QUESTIONS.length}`;
+    els.progressBar.style.width =
+      `${((index + 1) / QUESTIONS.length) * 100}%`;
+
+    els.questionImage.src = `images/imagequestion${index + 1}.png`;
+
+    startTimer();
+  }
+
+  function answer(value) {
+    answers[index] = value;
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    clearInterval(timerInterval);
+
+    if (index < QUESTIONS.length - 1) {
+      index++;
+      render();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    els.quiz.style.display = "none";
+    els.result.style.display = "block";
+
+    const correctCount = QUESTIONS.reduce(
+      (sum, q, i) => sum + (answers[i] === q.correct ? 1 : 0), 0
+    );
+
+    els.scoreLine.textContent =
+      `Je hebt ${correctCount} van de ${QUESTIONS.length} vragen goed beantwoord.`;
+  }
+
+  function showReview() {
+    els.result.style.display = "none";
+    els.review.style.display = "block";
+    els.reviewList.innerHTML = "";
+
+    QUESTIONS.forEach((q, i) => {
+      const isCorrect = answers[i] === q.correct;
+
+      const div = document.createElement("div");
+      div.className = `review-item ${isCorrect ? "correct" : "incorrect"}`;
+
+      div.innerHTML = `
+        <strong>Vraag ${i + 1}</strong><br>
+        Jouw antwoord: ${
+          answers[i] === null
+            ? "Geen antwoord"
+            : answers[i] ? "Betrouwbaar" : "Onbetrouwbaar"
+        }<br>
+        Correct antwoord: ${q.correct ? "Betrouwbaar" : "Onbetrouwbaar"}
+      `;
+
+      els.reviewList.appendChild(div);
+    });
+  }
+
+  function restart() {
+    clearInterval(timerInterval);
+    index = 0;
+    answers.fill(null);
+
+    els.result.style.display = "none";
+    els.review.style.display = "none";
+    els.quiz.style.display = "none";
+    els.intro.style.display = "block";
+  }
+
+  function openModal() {
+    els.imageModal.style.display = "flex";
+    els.imageModal.classList.add("show");
+    els.modalImage.src = els.questionImage.src;
+  }
+
+  function closeModal() {
+    els.imageModal.classList.remove("show");
+    setTimeout(() => {
+      els.imageModal.style.display = "none";
+    }, 300);
+  }
+
+  els.startBtn.onclick = () => {
+    index = 0;
+    answers.fill(null);
+
+    els.intro.style.display = "none";
+    els.review.style.display = "none";
+    els.result.style.display = "none";
+    els.quiz.style.display = "block";
+
+    render();
+  };
+
+  els.trueBtn.onclick = () => answer(true);
+  els.falseBtn.onclick = () => answer(false);
+  els.restartBtn.onclick = restart;
+  els.reviewBtn.onclick = showReview;
+  els.backToIntroBtn.onclick = restart;
+
+  els.questionImage.addEventListener("click", openModal);
+  els.modalClose.addEventListener("click", closeModal);
+  els.imageModal.addEventListener("click", (e) => {
+    if (e.target === els.imageModal) closeModal();
+  });
+
+  els.intro.style.display = "block";
+  els.quiz.style.display = "none";
+  els.result.style.display = "none";
+  els.review.style.display = "none";
+</script>
+
+
+</body>
+</html>
+
